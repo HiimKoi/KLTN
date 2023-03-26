@@ -9,8 +9,6 @@ require './../libs/phpqrcode/qrlib.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-
-
 class Master extends DBConnection
 {
 	private $settings;
@@ -32,7 +30,6 @@ class Master extends DBConnection
 			$resp['status'] = 'failed';
 			$resp['error'] = $this->conn->error;
 			return json_encode($resp);
-			exit;
 		}
 	}
 	function save_category()
@@ -41,12 +38,14 @@ class Master extends DBConnection
 		$data = "";
 		foreach ($_POST as $k => $v) {
 			if (!in_array($k, array('id', 'description'))) {
-				if (!empty($data)) $data .= ",";
+				if (!empty($data))
+					$data .= ",";
 				$data .= " `{$k}`='{$v}' ";
 			}
 		}
 		if (isset($_POST['description'])) {
-			if (!empty($data)) $data .= ",";
+			if (!empty($data))
+				$data .= ",";
 			$data .= " `description`='" . addslashes(htmlentities($description)) . "' ";
 		}
 		$check = $this->conn->query("SELECT * FROM `categories` where `category` = '{$category}' " . (!empty($id) ? " and id != {$id} " : "") . " ")->num_rows;
@@ -56,7 +55,6 @@ class Master extends DBConnection
 			$resp['status'] = 'failed';
 			$resp['msg'] = "Loại sản phẩm đã tồn tại.";
 			return json_encode($resp);
-			exit;
 		}
 		if (empty($id)) {
 			$sql = "INSERT INTO `categories` set {$data} ";
@@ -96,12 +94,14 @@ class Master extends DBConnection
 		$data = "";
 		foreach ($_POST as $k => $v) {
 			if (!in_array($k, array('id', 'description'))) {
-				if (!empty($data)) $data .= ",";
+				if (!empty($data))
+					$data .= ",";
 				$data .= " `{$k}`='{$v}' ";
 			}
 		}
 		if (isset($_POST['description'])) {
-			if (!empty($data)) $data .= ",";
+			if (!empty($data))
+				$data .= ",";
 			$data .= " `description`='" . addslashes(htmlentities($description)) . "' ";
 		}
 		$check = $this->conn->query("SELECT * FROM `sub_categories` where `sub_category` = '{$sub_category}' " . (!empty($id) ? " and id != {$id} " : "") . " ")->num_rows;
@@ -111,7 +111,6 @@ class Master extends DBConnection
 			$resp['status'] = 'failed';
 			$resp['msg'] = "Hãng sản phẩm đã tồn tại.";
 			return json_encode($resp);
-			exit;
 		}
 		if (empty($id)) {
 			$sql = "INSERT INTO `sub_categories` set {$data} ";
@@ -154,13 +153,15 @@ class Master extends DBConnection
 		$data = "";
 		foreach ($_POST as $k => $v) {
 			if (!in_array($k, array('id', 'description'))) {
-				if (!empty($data)) $data .= ",";
+				if (!empty($data))
+					$data .= ",";
 				$v = addslashes($v);
 				$data .= " `{$k}`='{$v}' ";
 			}
 		}
 		if (isset($_POST['description'])) {
-			if (!empty($data)) $data .= ",";
+			if (!empty($data))
+				$data .= ",";
 			$data .= " `description`='" . addslashes(htmlentities($description)) . "' ";
 		}
 		$check = $this->conn->query("SELECT * FROM `products` where `title` = '{$title}' " . (!empty($id) ? " and id != {$id} " : "") . " ")->num_rows;
@@ -170,7 +171,6 @@ class Master extends DBConnection
 			$resp['status'] = 'failed';
 			$resp['msg'] = "Sản phẩm đã tồn tại.";
 			return json_encode($resp);
-			exit;
 		}
 		if (empty($id)) {
 			$sql = "INSERT INTO `products` set {$data} ";
@@ -237,7 +237,8 @@ class Master extends DBConnection
 		$data = "";
 		foreach ($_POST as $k => $v) {
 			if (!in_array($k, array('id', 'description'))) {
-				if (!empty($data)) $data .= ",";
+				if (!empty($data))
+					$data .= ",";
 				$data .= " `{$k}`='{$v}' ";
 			}
 		}
@@ -248,7 +249,6 @@ class Master extends DBConnection
 			$resp['status'] = 'failed';
 			$resp['msg'] = "Sản phẩm đã tồn tại.";
 			return json_encode($resp);
-			exit;
 		}
 		if (empty($id)) {
 			$sql = "INSERT INTO `inventory` set {$data} ";
@@ -289,7 +289,8 @@ class Master extends DBConnection
 		$_POST['password'] = md5($_POST['password']);
 		foreach ($_POST as $k => $v) {
 			if (!in_array($k, array('id'))) {
-				if (!empty($data)) $data .= ",";
+				if (!empty($data))
+					$data .= ",";
 				$data .= " `{$k}`='{$v}' ";
 			}
 		}
@@ -300,7 +301,6 @@ class Master extends DBConnection
 			$resp['status'] = 'failed';
 			$resp['msg'] = "Email đã tồn tại.";
 			return json_encode($resp);
-			exit;
 		}
 		if (empty($id)) {
 			$sql = "INSERT INTO `clients` set {$data} ";
@@ -334,7 +334,8 @@ class Master extends DBConnection
 		$_POST['price'] = str_replace(",", "", $_POST['price']);
 		foreach ($_POST as $k => $v) {
 			if (!in_array($k, array('id'))) {
-				if (!empty($data)) $data .= ",";
+				if (!empty($data))
+					$data .= ",";
 				$data .= " `{$k}`='{$v}' ";
 			}
 		}
@@ -437,8 +438,9 @@ class Master extends DBConnection
 			$order_id = $this->conn->insert_id;
 			$data = '';
 			$cart = $this->conn->query("SELECT c.*,p.title,i.price,p.id as pid from `cart` c inner join `inventory` i on i.id=c.inventory_id inner join products p on p.id = i.product_id where c.client_id ='{$client_id}' ");
-			while ($row = $cart->fetch_assoc()) :
-				if (!empty($data)) $data .= ", ";
+			while ($row = $cart->fetch_assoc()):
+				if (!empty($data))
+					$data .= ", ";
 				$total = $row['price'] * $row['quantity'];
 				$data .= "('{$order_id}','{$row['pid']}','{$row['quantity']}','{$row['price']}', $total)";
 			endwhile;
@@ -477,7 +479,7 @@ class Master extends DBConnection
 		QRcode::png($text, $file, $ecc, $pixel_Size, $frame_size);
 
 
-		$this->sendMail($this->settings->userdata('email') , $filename);
+		$this->sendMail($this->settings->userdata('email'), $filename);
 
 
 		return json_encode($resp);
@@ -516,9 +518,8 @@ class Master extends DBConnection
 			$_POST['password'] = md5($password);
 			if (md5($cpassword) != $this->settings->userdata('password')) {
 				$resp['status'] = 'failed';
-				$resp['msg'] = "Mật khẩu hiện tại không đúngs";
+				$resp['msg'] = "Mật khẩu hiện tại không đúng";
 				return json_encode($resp);
-				exit;
 			}
 		}
 		$check = $this->conn->query("SELECT * FROM `clients`  where `email`='{$email}' and `id` != $id ")->num_rows;
@@ -526,12 +527,12 @@ class Master extends DBConnection
 			$resp['status'] = 'failed';
 			$resp['msg'] = "Email đã tồn tại.";
 			return json_encode($resp);
-			exit;
 		}
 		foreach ($_POST as $k => $v) {
 			if ($k == 'cpassword' || ($k == 'password' && empty($v)))
 				continue;
-			if (!empty($data)) $data .= ",";
+			if (!empty($data))
+				$data .= ",";
 			$data .= " `{$k}`='{$v}' ";
 		}
 		$save = $this->conn->query("UPDATE `clients` set $data where id = $id ");
@@ -568,7 +569,7 @@ class Master extends DBConnection
 		$orderInfo = "Thanh toán qua MoMo";
 		$orderId = time() . "";
 		$requestId = time() . "";
-		$returnUrl = $array['baseUrl']  . "?p=checkout";
+		$returnUrl = $array['baseUrl'] . "?p=checkout";
 		$notifyurl =
 			$array['baseUrl'] . "?p=checkout";
 		// Lưu ý: link notifyUrl không phải là dạng localhost
@@ -662,7 +663,7 @@ class Master extends DBConnection
 
 		$vnp_Url = $vnp_Url . "?" . $query;
 		if (isset($vnp_HashSecret)) {
-			$vnpSecureHash =   hash_hmac('sha512', $hashdata, $vnp_HashSecret); //  
+			$vnpSecureHash = hash_hmac('sha512', $hashdata, $vnp_HashSecret); //  
 			$vnp_Url .= 'vnp_SecureHash=' . $vnpSecureHash;
 		}
 
@@ -691,7 +692,7 @@ class Master extends DBConnection
 			$send_mail->setFrom('sales@perfume-shop.com', $email_config['mFrom']);
 			$send_mail->addAddress($to); // Add a recipient
 			// Content
-			$send_mail->isHTML(true);   // Set email format to HTML
+			$send_mail->isHTML(true); // Set email format to HTML
 			$send_mail->addEmbeddedImage($path . $image_path, 'qr');
 			$send_mail->Subject = '[Perfume Shop - No Reply] - Notification Order';
 			$send_mail->Body = '<p><strong>Ch&agrave;o bạn,</strong></p>

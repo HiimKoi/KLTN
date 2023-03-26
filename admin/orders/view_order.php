@@ -3,7 +3,7 @@ require_once('../../config.php');
 endif;?>
 <?php if($_settings->chk_flashdata('success')): ?>
 <script>
-	alert_toast("<?php echo $_settings->flashdata('success') ?>",'success')
+alert_toast("<?php echo $_settings->flashdata('success') ?>", 'success')
 </script>
 <?php endif;?>
 <?php 
@@ -56,7 +56,7 @@ if($order->num_rows > 0){
                         <td>
                             <p class="m-0"><?php echo $row['title']?></p>
                             <p class="m-0"><small>Nguyên liệu: <?php echo $row['author']?></small></p>
-                           
+
                         </td>
                         <td class="text-right"><?php echo number_format($row['price']) ?></td>
                         <td class="text-right"><?php echo number_format($row['price'] * $row['quantity']) ?></td>
@@ -65,7 +65,7 @@ if($order->num_rows > 0){
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan='3'  class="text-right">Tổng đơn hàng</th>
+                        <th colspan='3' class="text-right">Tổng đơn hàng</th>
                         <th class="text-right"><?php echo number_format($amount) ?></th>
                     </tr>
                 </tfoot>
@@ -74,13 +74,17 @@ if($order->num_rows > 0){
         <div class="row">
             <div class="col-6">
                 <p>Phương thức thanh toán: <?php echo $payment_method ?></p>
-                <p>Tình trạng thanh toán: <?php echo $paid == 0 ? '<span class="badge badge-light text-dark">Chưa thanh toán</span>' : '<span class="badge badge-success">Đã thanh toán</span>' ?></p>
-                <p>Phương thức giao hàng: <?php echo $order_type == 1 ? '<span class="badge badge-light text-dark">Giao hàng tận nơi</span>' : '<span class="badge badge-light text-dark">Đến cửa hàng</span>' ?></p>
+                <p>Tình trạng thanh toán:
+                    <?php echo $paid == 0 ? '<span class="badge badge-light text-dark">Chưa thanh toán</span>' : '<span class="badge badge-success">Đã thanh toán</span>' ?>
+                </p>
+                <p>Phương thức giao hàng:
+                    <?php echo $order_type == 1 ? '<span class="badge badge-light text-dark">Giao hàng tận nơi</span>' : '<span class="badge badge-light text-dark">Đến cửa hàng</span>' ?>
+                </p>
             </div>
             <div class="col-6 row row-cols-2">
                 <div class="col-3">Tình trạng đơn hàng:</div>
                 <div class="col-9">
-                <?php 
+                    <?php 
                     switch($status){
                         case '0':
                             echo '<span class="badge badge-light text-dark">Chờ xác nhận</span>';
@@ -109,7 +113,7 @@ if($order->num_rows > 0){
                     <button type="button" id="update_status" class="btn btn-sm btn-flat btn-primary">Cập nhật</button>
                 </div>
                 <?php endif; ?>
-                
+
             </div>
         </div>
     </div>
@@ -119,18 +123,20 @@ if($order->num_rows > 0){
     <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
 </div>
 <style>
-    #uni_modal>.modal-dialog>.modal-content>.modal-footer{
-        display:none;
-    }
-    #uni_modal .modal-body{
-        padding:0;
-    }
+#uni_modal>.modal-dialog>.modal-content>.modal-footer {
+    display: none;
+}
+
+#uni_modal .modal-body {
+    padding: 0;
+}
 </style>
 <?php endif; ?>
 <script>
-    $(function(){
-        $('#update_status').click(function(){
-            uni_modal("Update Status", "./orders/update_status.php?oid=<?php echo $id ?>&status=<?php echo $status ?>")
-        })
+$(function() {
+    $('#update_status').click(function() {
+        uni_modal("Update Status",
+            "./orders/update_status.php?oid=<?php echo $id ?>&status=<?php echo $status ?>")
     })
+})
 </script>
