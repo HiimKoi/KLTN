@@ -53,6 +53,7 @@ class Login extends DBConnection
 			return json_encode($resp);
 		}
 
+		$username = escape_string($username);
 		$hash_password = md5($password);
 		$qry = $this->conn->query("SELECT * from users where username = '$username' and password = '$hash_password' ");
 		if ($qry->num_rows > 0) {

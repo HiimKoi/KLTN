@@ -32,6 +32,7 @@ function escape_string($data)
         ")" => "\)",
         "(" => "\(",
         "--" => "",
+        "#" => ""
     );
 
     return str_replace(array_keys($escape_array), $escape_array, $data);
