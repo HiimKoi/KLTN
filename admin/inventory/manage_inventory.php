@@ -1,4 +1,5 @@
 <?php
+
 if (isset($_GET['id']) && is_numeric($_GET['id']) && $_GET['id'] > 0) {
 
 	$id_int = intval($_GET['id']);
@@ -9,6 +10,9 @@ if (isset($_GET['id']) && is_numeric($_GET['id']) && $_GET['id'] > 0) {
 			$$k = $v;
 		}
 	}
+} else {
+	$_settings->set_flashdata('error', 'Inventory ID provided is Unknown');
+	redirect('admin/?page=inventory');
 }
 ?>
 <div class="card card-outline card-info">

@@ -1,13 +1,16 @@
 <?php
 if (isset($_GET['id']) && is_numeric($_GET['id']) && $_GET['id'] > 0) {
-	$id_int = intval($_GET['id']);
+    $id_int = intval($_GET['id']);
 
-	$qry = $conn->query("SELECT * from `sub_categories` where id = $id_int ");
-	if ($qry->num_rows > 0) {
-		foreach ($qry->fetch_assoc() as $k => $v) {
-			$$k = $v;
-		}
-	}
+    $qry = $conn->query("SELECT * from `sub_categories` where id = $id_int ");
+    if ($qry->num_rows > 0) {
+        foreach ($qry->fetch_assoc() as $k => $v) {
+            $$k = $v;
+        }
+    }
+} else {
+    $_settings->set_flashdata('error', 'SubCategory ID provided is Unknown');
+    redirect('admin/?page=maintenance/category');
 }
 ?>
 <div class="card card-outline card-info">
@@ -24,12 +27,11 @@ if (isset($_GET['id']) && is_numeric($_GET['id']) && $_GET['id'] > 0) {
                 <select name="parent_id" id="parent_id" class="custom-select select2">
                     <option value=""></option>
                     <?php
-					$qry = $conn->query("SELECT * FROM `categories` order by category asc");
-					while ($row = $qry->fetch_assoc()):
-						?>
-                    <option value="<?php echo $row['id'] ?>"
-                        <?php echo isset($parent_id) && $parent_id == $row['id'] ? 'selected' : '' ?>>
-                        <?php echo $row['category'] ?></option>
+                    $qry = $conn->query("SELECT * FROM `categories` order by category asc");
+                    while ($row = $qry->fetch_assoc()):
+                        ?>
+                        <option value="<?php echo $row['id'] ?>" <?php echo isset($parent_id) && $parent_id == $row['id'] ? 'selected' : '' ?>>
+                            <?php echo $row['category'] ?></option>
                     <?php endwhile; ?>
                 </select>
             </div>
@@ -60,65 +62,65 @@ if (isset($_GET['id']) && is_numeric($_GET['id']) && $_GET['id'] > 0) {
     </div>
 </div>
 <script>
-$(document).ready(function() {
-    $('.select2').select2({
-        placeholder: "Please Select here",
-        width: "relative"
-    })
-    $('#category-form').submit(function(e) {
-        e.preventDefault();
-        var _this = $(this)
-        $('.err-msg').remove();
-        start_loader();
-        $.ajax({
-            url: _base_url_ + "classes/Master.php?f=save_sub_category",
-            data: new FormData($(this)[0]),
-            cache: false,
-            contentType: false,
-            processData: false,
-            method: 'POST',
-            type: 'POST',
-            dataType: 'json',
-            error: err => {
-                console.log(err)
-                alert_toast("An error occured", 'error');
-                end_loader();
-            },
-            success: function(resp) {
-                if (typeof resp == 'object' && resp.status == 'success') {
-                    location.href = "./?page=maintenance/sub_category";
-                } else if (resp.status == 'failed' && !!resp.msg) {
-                    var el = $('<div>')
-                    el.addClass("alert alert-danger err-msg").text(resp.msg)
-                    _this.prepend(el)
-                    el.show('slow')
-                    $("html, body").animate({
-                        scrollTop: _this.closest('.card').offset().top
-                    }, "fast");
-                    end_loader()
-                } else {
+    $(document).ready(function () {
+        $('.select2').select2({
+            placeholder: "Please Select here",
+            width: "relative"
+        })
+        $('#category-form').submit(function (e) {
+            e.preventDefault();
+            var _this = $(this)
+            $('.err-msg').remove();
+            start_loader();
+            $.ajax({
+                url: _base_url_ + "classes/Master.php?f=save_sub_category",
+                data: new FormData($(this)[0]),
+                cache: false,
+                contentType: false,
+                processData: false,
+                method: 'POST',
+                type: 'POST',
+                dataType: 'json',
+                error: err => {
+                    console.log(err)
                     alert_toast("An error occured", 'error');
                     end_loader();
-                    console.log(resp)
+                },
+                success: function (resp) {
+                    if (typeof resp == 'object' && resp.status == 'success') {
+                        location.href = "./?page=maintenance/sub_category";
+                    } else if (resp.status == 'failed' && !!resp.msg) {
+                        var el = $('<div>')
+                        el.addClass("alert alert-danger err-msg").text(resp.msg)
+                        _this.prepend(el)
+                        el.show('slow')
+                        $("html, body").animate({
+                            scrollTop: _this.closest('.card').offset().top
+                        }, "fast");
+                        end_loader()
+                    } else {
+                        alert_toast("An error occured", 'error');
+                        end_loader();
+                        console.log(resp)
+                    }
                 }
-            }
+            })
+        })
+
+        $('.summernote').summernote({
+            height: 200,
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript',
+                    'clear'
+                ]],
+                ['fontname', ['fontname']],
+                ['fontsize', ['fontsize']],
+                ['color', ['color']],
+                ['para', ['ol', 'ul', 'paragraph', 'height']],
+                ['table', ['table']],
+                ['view', ['undo', 'redo', 'fullscreen', 'codeview', 'help']]
+            ]
         })
     })
-
-    $('.summernote').summernote({
-        height: 200,
-        toolbar: [
-            ['style', ['style']],
-            ['font', ['bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript',
-                'clear'
-            ]],
-            ['fontname', ['fontname']],
-            ['fontsize', ['fontsize']],
-            ['color', ['color']],
-            ['para', ['ol', 'ul', 'paragraph', 'height']],
-            ['table', ['table']],
-            ['view', ['undo', 'redo', 'fullscreen', 'codeview', 'help']]
-        ]
-    })
-})
 </script>
