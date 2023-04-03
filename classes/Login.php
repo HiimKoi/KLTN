@@ -46,7 +46,7 @@ class Login extends DBConnection
 			}
 		}
 
-		// check input email/password
+		// check input email / password
 		if (!isset($username) || !isset($password)) {
 			$resp['status'] = 'error';
 			$resp['message'] = 'Vui lòng nhập email và password.';
@@ -55,19 +55,60 @@ class Login extends DBConnection
 
 		$username = escape_string($username);
 		$hash_password = md5($password);
-		$qry = $this->conn->query("SELECT * from users where username = '$username' and password = '$hash_password' ");
-		if ($qry->num_rows > 0) {
-			foreach ($qry->fetch_array() as $k => $v) {
-				if (!is_numeric($k) && $k != 'password') {
-					$this->settings->set_userdata($k, $v);
-				}
-			}
-			$this->settings->set_userdata('login_type', 1);
-			return json_encode(array('status' => 'success'));
-		} else {
-			// return json_encode(array('status' => 'incorrect', 'last_qry' => "SELECT * from users where username = '$username' and password = md5('$password') "));
-			return json_encode(array('status' => 'incorrect'));
+		// $qry = $this->conn->query("SELECT * from users where username = '$username' and password = '$hash_password' ");
+		$qry = $this->conn->query("SELECT * from users where username = '$username'");
+
+		if ($qry->num_rows <= 0) {
+			$resp['status'] = 'incorrect';
+			return json_encode($resp);
 		}
+
+		foreach ($qry->fetch_assoc() as $k => $v) {
+			$$k = $v;
+		}
+
+		$current_time = new DateTime('now');
+		$last_login_time = new DateTime($last_login);
+
+		$interval = $current_time->diff($last_login_time);
+		$minutes = $interval->format('%i');
+
+		// check time
+		if ($count_failed >= 5 && $minutes < 10) {
+			$resp['status'] = 'error';
+			$after_time = 10 - $minutes;
+			$resp['message'] = "Login sai nhiều lần, vui lòng thử lại sau $after_time phút.";
+			return json_encode($resp);
+		}
+
+		$last_login = $current_time->format('Y-m-d H:i:s');
+
+		if ($hash_password != $password) {
+			$count_failed += 1;
+			$sql_update = "UPDATE `users` SET last_login = '$last_login', count_failed=$count_failed where username='$username'";
+			$this->conn->query($sql_update);
+
+			$resp['status'] = 'incorrect';
+			return json_encode($resp);
+		} else {
+			$count_failed = 0;
+			$sql_update = "UPDATE `users` SET last_login = '$last_login', count_failed=$count_failed where username='$username'";
+			$this->conn->query($sql_update);
+		}
+
+		$this->settings->set_userdata('login_type', 1);
+
+
+		return json_encode(array('status' => 'success'));
+
+
+
+		// if ($qry->num_rows > 0) {
+
+		// } else {
+		// 	// return json_encode(array('status' => 'incorrect', 'last_qry' => "SELECT * from users where username = '$username' and password = md5('$password') "));
+		// 	return json_encode(array('status' => 'incorrect'));
+		// }
 	}
 	public function logout()
 	{
