@@ -8,10 +8,11 @@ if (isset($_GET['id']) && is_numeric($_GET['id']) && $_GET['id'] > 0) {
             $$k = $v;
         }
     }
-} else {
-    $_settings->set_flashdata('error', 'Category ID provided is Unknown');
-    redirect('admin/?page=maintenance/category');
-}
+} 
+// else {
+//     $_settings->set_flashdata('error', 'Category ID provided is Unknown');
+//     redirect('admin/?page=maintenance/category');
+// }
 ?>
 <div class="card card-outline card-info">
     <div class="card-header">
@@ -49,61 +50,61 @@ if (isset($_GET['id']) && is_numeric($_GET['id']) && $_GET['id'] > 0) {
     </div>
 </div>
 <script>
-    $(document).ready(function () {
-        $('#category-form').submit(funct ion(e) {
-            e.preventDefault();
-            var _this = $(this)
+$(document).ready(function() {
+    $('#category-form').submit(funct ion(e) {
+        e.preventDefault();
+        var _this = $(this)
         $('.err-msg').remove();
-            start_loader();
+        start_loader();
         $.ajax({
-                url: _base_url_ + "classes/Master.php?f=save_category",
-                data: new FormData($(this)[0]),
-                cache: false,
-                contentType: false,
-                processData: false,
-                method: 'POST',
-                type: 'POST',
-                dataType: 'json',
-                error: err => {
-                    console.log(err)
+            url: _base_url_ + "classes/Master.php?f=save_category",
+            data: new FormData($(this)[0]),
+            cache: false,
+            contentType: false,
+            processData: false,
+            method: 'POST',
+            type: 'POST',
+            dataType: 'json',
+            error: err => {
+                console.log(err)
+                alert_toast("An error occured", 'error');
+                end_loader();
+            },
+            success: function(resp) {
+                if (typeof resp == 'object' && resp.status == 'success') {
+                    location.href = "./?page=maintenance/category";
+                } else if (resp.status == 'failed' && !!resp.msg) {
+                    var el = $('<div>')
+                    el.addClass("alert alert-danger err-msg").text(resp.msg)
+                    _this.prepend(el)
+                    el.show('slow')
+                    $("html, body").animate({
+                        scrollTop: _this.closest('.card').offset().top
+                    }, "fast");
+                    end_loader()
+                } else {
                     alert_toast("An error occured", 'error');
                     end_loader();
-                },
-                success: function (resp) {
-                    if (typeof resp == 'object' && resp.status == 'success') {
-                        location.href = "./?page=maintenance/category";
-                    } else if (resp.status == 'failed' && !!resp.msg) {
-                        var el = $('<div>')
-                        el.addClass("alert alert-danger err-msg").text(resp.msg)
-                        _this.prepend(el)
-                        el.show('slow')
-                        $("html, body").animate({
-                            scrollTop: _this.closest('.card').offset().top
-                        }, "fast");
-                        end_loader()
-                    } else {
-                        alert_toast("An error occured", 'error');
-                        end_loader();
-                        console.log(resp)
-                    }
+                    console.log(resp)
                 }
-            })
-        })
-
-        $('.summernote').summernote({
-            height: 200,
-            toolbar: [
-                ['style', ['style']],
-                ['font', ['bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript',
-                    'clear'
-                ]],
-                ['fontname', ['fontname']],
-                ['fontsize', ['fontsize']],
-                ['color', ['color']],
-                ['para', ['ol', 'ul', 'paragraph', 'height']],
-                ['table', ['table']],
-                ['view', ['undo', 'redo', 'fullscreen', 'codeview', 'help']]
-            ]
+            }
         })
     })
+
+    $('.summernote').summernote({
+        height: 200,
+        toolbar: [
+            ['style', ['style']],
+            ['font', ['bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript',
+                'clear'
+            ]],
+            ['fontname', ['fontname']],
+            ['fontsize', ['fontsize']],
+            ['color', ['color']],
+            ['para', ['ol', 'ul', 'paragraph', 'height']],
+            ['table', ['table']],
+            ['view', ['undo', 'redo', 'fullscreen', 'codeview', 'help']]
+        ]
+    })
+})
 </script>

@@ -247,7 +247,7 @@ class Master extends DBConnection
 			return $this->capture_err();
 		if ($check > 0) {
 			$resp['status'] = 'failed';
-			$resp['msg'] = "Sản phẩm đã tồn tại.";
+			$resp['msg'] = "Sản phẩm đã tồn tại trong kho, vui lòng cập nhật số lượng.";
 			return json_encode($resp);
 		}
 		if (empty($id)) {
