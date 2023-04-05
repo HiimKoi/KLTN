@@ -1,4 +1,9 @@
 <?php
 session_start();
-session_destroy();
+
+if (isset($_SESSION['userdata']['id'])) {
+    unset($_SESSION['userdata']);
+}
+
 header('location:./');
+?>

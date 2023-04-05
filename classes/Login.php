@@ -96,23 +96,40 @@ class Login extends DBConnection
 			$this->conn->query($sql_update);
 		}
 
-		$this->settings->set_userdata('login_type', 1);
+		$this->settings->set_admindata('login_type', 1);
+		// $this->settings->set_admindata('login_type', 1);
+		// $this->settings->set_admindata('login_type', 1);
+		// $this->settings->set_admindata('login_type', 1);
+		// $this->settings->set_admindata('login_type', 1);
+		// $this->settings->set_admindata('login_type', 1);
+
+
+		$this->settings->set_admindata("id", $id);
+		$this->settings->set_admindata("firstname", $firstname);
+		$this->settings->set_admindata("lastname", $lastname);
+		$this->settings->set_admindata("username", $username);
+		// $this->settings->set_userdata("password", $password);
+		$this->settings->set_admindata("avatar", $avatar);
+		$this->settings->set_admindata("last_login", $last_login);
+		$this->settings->set_admindata("type", $type);
+		$this->settings->set_admindata("date_added", $date_added);
+		$this->settings->set_admindata("date_updated", $date_updated);
+		$this->settings->set_admindata("count_failed", $count_failed);
+
 
 
 		return json_encode(array('status' => 'success'));
-
-
-
-		// if ($qry->num_rows > 0) {
-
-		// } else {
-		// 	// return json_encode(array('status' => 'incorrect', 'last_qry' => "SELECT * from users where username = '$username' and password = md5('$password') "));
-		// 	return json_encode(array('status' => 'incorrect'));
-		// }
 	}
 	public function logout()
 	{
 		if ($this->settings->sess_des()) {
+			redirect('admin/login.php');
+		}
+	}
+
+	public function logout_admin()
+	{
+		if ($this->settings->sess_des_admin()) {
 			redirect('admin/login.php');
 		}
 	}
@@ -225,6 +242,9 @@ switch ($action) {
 		break;
 	case 'logout':
 		echo $auth->logout();
+		break;
+	case 'logout_admin':
+		echo $auth->logout_admin();
 		break;
 	default:
 		echo $auth->index();

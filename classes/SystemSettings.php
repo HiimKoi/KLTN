@@ -88,6 +88,13 @@ class SystemSettings extends DBConnection
 			$_SESSION['userdata'][$field] = $value;
 		}
 	}
+	function set_admindata($field = '', $value = '')
+	{
+		if (!empty($field) && !empty($value)) {
+			$_SESSION['admindata'][$field] = $value;
+		}
+	}
+
 	function userdata($field = '')
 	{
 		if (!empty($field)) {
@@ -99,6 +106,21 @@ class SystemSettings extends DBConnection
 			return false;
 		}
 	}
+
+	function admindata($field = '')
+	{
+		if (!empty($field)) {
+			if (isset($_SESSION['admindata'][$field]))
+				return $_SESSION['admindata'][$field];
+			else
+				return null;
+		} else {
+			return false;
+		}
+	}
+
+
+
 	function set_flashdata($flash = '', $value = '')
 	{
 		if (!empty($flash) && !empty($value)) {
@@ -132,6 +154,16 @@ class SystemSettings extends DBConnection
 		}
 		return true;
 	}
+
+	function sess_des_admin()
+	{
+		if (isset($_SESSION['admindata'])) {
+			unset($_SESSION['admindata']);
+			return true;
+		}
+		return true;
+	}
+
 	function info($field = '')
 	{
 		if (!empty($field)) {
