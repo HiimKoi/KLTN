@@ -533,6 +533,7 @@ class Master extends DBConnection
 				continue;
 			if (!empty($data))
 				$data .= ",";
+			$v = htmlspecialchars($v);
 			$data .= " `{$k}`='{$v}' ";
 		}
 		$save = $this->conn->query("UPDATE `clients` set $data where id = $id ");
@@ -548,6 +549,8 @@ class Master extends DBConnection
 			$resp['status'] = 'failed';
 			$resp['error'] = $this->conn->error;
 		}
+
+		$resp["test-data"] = $data;
 		return json_encode($resp);
 	}
 
