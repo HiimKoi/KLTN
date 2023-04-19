@@ -180,17 +180,64 @@ class Master extends DBConnection
 			$sql = "UPDATE `products` set {$data} where id = '{$id}' ";
 			$save = $this->conn->query($sql);
 		}
+
 		if ($save) {
 			$upload_path = "uploads/product_" . $id;
 			if (!is_dir(base_app . $upload_path))
 				mkdir(base_app . $upload_path);
 			if (isset($_FILES['img']) && count($_FILES['img']['tmp_name']) > 0) {
+				$arrData = [];
+				$msg = "";
+
 				foreach ($_FILES['img']['tmp_name'] as $k => $v) {
-					if (!empty($_FILES['img']['tmp_name'][$k])) {
+
+					$hasError = false;
+
+					// get type file
+					$filePath = $_FILES['img']['tmp_name'][$k];
+					$fileSize = filesize($filePath);
+					$fileInfo = finfo_open(FILEINFO_MIME_TYPE);
+					$fileType = finfo_file($fileInfo, $filePath);
+					$fileName = $_FILES['img']['name'][$k];
+
+					// check file is exist
+					if ($fileSize === 0) {
+						$hasError = true;
+						$msg = 'File "' . $fileName . '" is empty.';
+					}
+
+					// check file size
+					if ($fileSize > 3145728) { // 3 MB (1 byte * 1024 * 1024 * 3 (for 3 MB))
+						$hasError = true;
+						$msg = 'File "' . $fileName . '" is too large.';
+					}
+
+					// define extensionn allowed
+					$allowedTypes = array(
+						'image/png' => 'png',
+						'image/jpeg' => 'jpg'
+					);
+
+					// check extension file uploaded by user
+					if (!array_key_exists($fileType, $allowedTypes)) {
+						$hasError = true;
+						// $resp['msgError'][$fileName] = 'File "' . $fileName . '" extension not allowed.';
+						$msg = 'File "' . $fileName . '" extension not allowed.';
+					}
+
+					// move file if pass all condition
+					if (!$hasError) {
 						move_uploaded_file($_FILES['img']['tmp_name'][$k], base_app . $upload_path . '/' . $_FILES['img']['name'][$k]);
+						$arrData[] = array("status" => true, "msg" => 'File "' . $fileName . '" upload success.');
+					} else {
+						$arrData[] = array("status" => false, "msg" => $msg);
 					}
 				}
+
+				// append message upload file to response
+				$resp["data"] = $arrData;
 			}
+
 			$resp['status'] = 'success';
 			if (empty($id))
 				$this->settings->set_flashdata('success', "Đã lưu sản phẩm");
@@ -198,8 +245,9 @@ class Master extends DBConnection
 				$this->settings->set_flashdata('success', "Đã cập nhật sản phẩm");
 		} else {
 			$resp['status'] = 'failed';
-			$resp['err'] = $this->conn->error . "[{$sql}]";
+			$resp['err'] = "System error.";
 		}
+
 		return json_encode($resp);
 	}
 	function delete_product()
@@ -550,7 +598,7 @@ class Master extends DBConnection
 			$resp['error'] = $this->conn->error;
 		}
 
-		$resp["test-data"] = $data;
+		// $resp["test-data"] = $data;
 		return json_encode($resp);
 	}
 

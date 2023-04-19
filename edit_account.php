@@ -66,96 +66,96 @@
     </div>
 </section>
 <script>
-$(function() {
-    $('#update_account [name="password"],#update_account [name="cpassword"]').on('input', function() {
-        if ($('#update_account [name="password"]').val() != '' || $(
+    $(function () {
+        $('#update_account [name="password"],#update_account [name="cpassword"]').on('input', function () {
+            if ($('#update_account [name="password"]').val() != '' || $(
                 '#update_account [name="cpassword"]').val() != '')
-            $('#update_account [name="password"],#update_account [name="cpassword"]').attr('required',
-                true);
-        else
-            $('#update_account [name="password"],#update_account [name="cpassword"]').attr('required',
-                false);
-    })
-    $('#update_account').submit(function(e) {
-        e.preventDefault();
-
-
-
-        // return;
-
-        start_loader()
-        if ($('.err-msg').length > 0)
-            $('.err-msg').remove();
-        $.ajax({
-            url: _base_url_ + "classes/Master.php?f=update_account",
-            method: "POST",
-            data: $(this).serialize(),
-            dataType: "json",
-            error: err => {
-                console.log(err)
-                alert_toast("an error occured", 'error')
-                end_loader()
-            },
-            success: function(resp) {
-                // debugger;
-                console.log(resp);
-                if (typeof resp == 'object' && resp.status == 'success') {
-                    alert_toast("Account succesfully updated", 'success');
-                    $('#update_account [name="password"],#update_account [name="cpassword"]')
-                        .attr('required', false);
-                    $('#update_account [name="password"],#update_account [name="cpassword"]')
-                        .val('');
-
-                    // clean input
-                    let firstname = htmlspecialchars($("input[name=firstname]").val());
-                    $("input[name=firstname]").val(firstname);
-                    console.log($("input[name=firstname]").val());
-
-                    let lastname = htmlspecialchars($("input[name=lastname]").val());
-                    $("input[name=lastname]").val(lastname);
-                    console.log($("input[name=lastname]").val());
-
-                    let contact = htmlspecialchars($("input[name=contact]").val());
-                    $("input[name=contact]").val(contact);
-                    console.log($("input[name=contact]").val());
-
-                    let address = htmlspecialchars($(
-                        "textarea[name=default_delivery_address]").val());
-                    $("textarea[name=default_delivery_address]").val(address);
-
-                    console.log($("textarea[name=default_delivery_address]").val());
-
-                    let email = htmlspecialchars($("input[name=email]").val());
-                    $("input[name=email]").val(email);
-
-                } else if (resp.status == 'failed' && !!resp.msg) {
-                    var _err_el = $('<div>')
-                    _err_el.addClass("alert alert-danger err-msg").text(resp.msg)
-                    $('#update_account').prepend(_err_el)
-                    $('body, html').animate({
-                        scrollTop: 0
-                    }, 'fast')
-                    end_loader()
-
-                } else {
-                    console.log(resp)
-                    alert_toast("an error occured", 'error')
-                }
-                end_loader()
-            }
+                $('#update_account [name="password"],#update_account [name="cpassword"]').attr('required',
+                    true);
+            else
+                $('#update_account [name="password"],#update_account [name="cpassword"]').attr('required',
+                    false);
         })
-    })
-});
+        $('#update_account').submit(function (e) {
+            e.preventDefault();
 
-function htmlspecialchars(str) {
 
-    return str
-        .replace(/&/g, '&amp;')
-        .replace(/>/g, '&gt;')
-        .replace(/</g, '&lt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&apos;');
 
-    return str;
-}
+            // return;
+
+            start_loader()
+            if ($('.err-msg').length > 0)
+                $('.err-msg').remove();
+            $.ajax({
+                url: _base_url_ + "classes/Master.php?f=update_account",
+                method: "POST",
+                data: $(this).serialize(),
+                dataType: "json",
+                error: err => {
+                    console.log(err)
+                    alert_toast("an error occured", 'error')
+                    end_loader()
+                },
+                success: function (resp) {
+                    // debugger;
+                    // console.log(resp);
+                    if (typeof resp == 'object' && resp.status == 'success') {
+                        alert_toast("Account succesfully updated", 'success');
+                        $('#update_account [name="password"],#update_account [name="cpassword"]')
+                            .attr('required', false);
+                        $('#update_account [name="password"],#update_account [name="cpassword"]')
+                            .val('');
+
+                        // clean input
+                        let firstname = htmlspecialchars($("input[name=firstname]").val());
+                        $("input[name=firstname]").val(firstname);
+                        // console.log($("input[name=firstname]").val());
+
+                        let lastname = htmlspecialchars($("input[name=lastname]").val());
+                        $("input[name=lastname]").val(lastname);
+                        // console.log($("input[name=lastname]").val());
+
+                        let contact = htmlspecialchars($("input[name=contact]").val());
+                        $("input[name=contact]").val(contact);
+                        // console.log($("input[name=contact]").val());
+
+                        let address = htmlspecialchars($(
+                            "textarea[name=default_delivery_address]").val());
+                        $("textarea[name=default_delivery_address]").val(address);
+
+                        // console.log($("textarea[name=default_delivery_address]").val());
+
+                        let email = htmlspecialchars($("input[name=email]").val());
+                        $("input[name=email]").val(email);
+
+                    } else if (resp.status == 'failed' && !!resp.msg) {
+                        var _err_el = $('<div>')
+                        _err_el.addClass("alert alert-danger err-msg").text(resp.msg)
+                        $('#update_account').prepend(_err_el)
+                        $('body, html').animate({
+                            scrollTop: 0
+                        }, 'fast')
+                        end_loader()
+
+                    } else {
+                        // console.log(resp)
+                        alert_toast("an error occured", 'error')
+                    }
+                    end_loader()
+                }
+            })
+        })
+    });
+
+    function htmlspecialchars(str) {
+
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/>/g, '&gt;')
+            .replace(/</g, '&lt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&apos;');
+
+        return str;
+    }
 </script>
