@@ -52,34 +52,121 @@ class SystemSettings extends DBConnection
 		if (isset($_POST['privacy_policy'])) {
 			file_put_contents('../privacy_policy.html', $_POST['privacy_policy']);
 		}
+
+		$arrData = [];
+		$msg = "";
+		// change imag logo
 		if (isset($_FILES['img']) && $_FILES['img']['tmp_name'] != '') {
-			$fname = 'uploads/' . strtotime(date('y-m-d H:i')) . '_' . $_FILES['img']['name'];
-			$move = move_uploaded_file($_FILES['img']['tmp_name'], '../' . $fname);
-			if (isset($_SESSION['system_info']['logo'])) {
-				$qry = $this->conn->query("UPDATE system_info set meta_value = '{$fname}' where meta_field = 'logo' ");
-				if (is_file('../' . $_SESSION['system_info']['logo']))
-					unlink('../' . $_SESSION['system_info']['logo']);
+			$hasError = false;
+
+			// get type file
+			$filePath = $_FILES['img']['tmp_name'];
+			$fileSize = filesize($filePath);
+			$fileInfo = finfo_open(FILEINFO_MIME_TYPE);
+			$fileType = finfo_file($fileInfo, $filePath);
+			$fileName = $_FILES['img']['name'];
+
+			// check file is exist
+			if ($fileSize === 0) {
+				$hasError = true;
+				$msg = 'File "' . $fileName . '" is empty.';
+			}
+
+			// check file size
+			if ($fileSize > 3145728) { // 3 MB (1 byte * 1024 * 1024 * 3 (for 3 MB))
+				$hasError = true;
+				$msg = 'File "' . $fileName . '" is too large.';
+			}
+
+			// define extensionn allowed
+			$allowedTypes = array(
+				'image/png' => 'png',
+				'image/jpeg' => 'jpg'
+			);
+
+			// check extension file uploaded by user
+			if (!array_key_exists($fileType, $allowedTypes)) {
+				$hasError = true;
+				$msg = 'File "' . $fileName . '" extension not allowed.';
+			}
+
+			// move file if pass all condition
+			if (!$hasError) {
+				$fname = 'uploads/' . strtotime(date('y-m-d H:i')) . '_' . $_FILES['img']['name'];
+				$move = move_uploaded_file($_FILES['img']['tmp_name'], '../' . $fname);
+				if (isset($_SESSION['system_info']['logo'])) {
+					$qry = $this->conn->query("UPDATE system_info set meta_value = '{$fname}' where meta_field = 'logo' ");
+					if (is_file('../' . $_SESSION['system_info']['logo']))
+						unlink('../' . $_SESSION['system_info']['logo']);
+				} else {
+					$qry = $this->conn->query("INSERT into system_info set meta_value = '{$fname}',meta_field = 'logo' ");
+				}
+				$arrData[] = array("status" => true, "msg" => 'File "' . $fileName . '" upload success.');
 			} else {
-				$qry = $this->conn->query("INSERT into system_info set meta_value = '{$fname}',meta_field = 'logo' ");
+				$arrData[] = array("status" => false, "msg" => $msg);
 			}
 		}
+
+		// change image backgroud
 		if (isset($_FILES['cover']) && $_FILES['cover']['tmp_name'] != '') {
-			$fname = 'uploads/' . strtotime(date('y-m-d H:i')) . '_' . $_FILES['cover']['name'];
-			$move = move_uploaded_file($_FILES['cover']['tmp_name'], '../' . $fname);
-			if (isset($_SESSION['system_info']['cover'])) {
-				$qry = $this->conn->query("UPDATE system_info set meta_value = '{$fname}' where meta_field = 'cover' ");
-				if (is_file('../' . $_SESSION['system_info']['cover']))
-					unlink('../' . $_SESSION['system_info']['cover']);
+
+			$hasError = false;
+
+			// get type file
+			$filePath = $_FILES['cover']['tmp_name'];
+			$fileSize = filesize($filePath);
+			$fileInfo = finfo_open(FILEINFO_MIME_TYPE);
+			$fileType = finfo_file($fileInfo, $filePath);
+			$fileName = $_FILES['cover']['name'];
+
+			// check file is exist
+			if ($fileSize === 0) {
+				$hasError = true;
+				$msg = 'File "' . $fileName . '" is empty.';
+			}
+
+			// check file size
+			if ($fileSize > 3145728) { // 3 MB (1 byte * 1024 * 1024 * 3 (for 3 MB))
+				$hasError = true;
+				$msg = 'File "' . $fileName . '" is too large.';
+			}
+
+			// define extensionn allowed
+			$allowedTypes = array(
+				'image/png' => 'png',
+				'image/jpeg' => 'jpg'
+			);
+
+			// check extension file uploaded by user
+			if (!array_key_exists($fileType, $allowedTypes)) {
+				$hasError = true;
+				$msg = 'File "' . $fileName . '" extension not allowed.';
+			}
+
+			// move file if pass all condition
+			if (!$hasError) {
+				$fname = 'uploads/' . strtotime(date('y-m-d H:i')) . '_' . $_FILES['cover']['name'];
+				$move = move_uploaded_file($_FILES['cover']['tmp_name'], '../' . $fname);
+				if (isset($_SESSION['system_info']['cover'])) {
+					$qry = $this->conn->query("UPDATE system_info set meta_value = '{$fname}' where meta_field = 'cover' ");
+					if (is_file('../' . $_SESSION['system_info']['cover']))
+						unlink('../' . $_SESSION['system_info']['cover']);
+				} else {
+					$qry = $this->conn->query("INSERT into system_info set meta_value = '{$fname}',meta_field = 'cover' ");
+				}
+				$arrData[] = array("status" => true, "msg" => 'File "' . $fileName . '" upload success.');
 			} else {
-				$qry = $this->conn->query("INSERT into system_info set meta_value = '{$fname}',meta_field = 'cover' ");
+				$arrData[] = array("status" => false, "msg" => $msg);
 			}
 		}
 
 		$update = $this->update_system_info();
-		$flash = $this->set_flashdata('success', 'System Info Successfully Updated.');
-		if ($update && $flash) {
-			// var_dump($_SESSION);
-			return true;
+		// $flash = $this->set_flashdata('success', 'System Info Successfully Updated.');
+
+		// if ($update && $flash) {
+		if ($update) {
+			$resp["data"] = $arrData;
+			return json_encode($resp);
 		}
 	}
 	function set_userdata($field = '', $value = '')

@@ -159,15 +159,46 @@ $(document).ready(function () {
       method: "POST",
       type: "POST",
       success: function (resp) {
-        if (resp == 1) {
-          // alert_toast("Data successfully saved",'success')
-          location.reload();
-        } else {
-          $("#msg").html(
-            '<div class="alert alert-danger err_msg">An Error occured</div>'
-          );
-          end_load();
-        }
+        console.log(resp);
+        end_loader();
+
+        // console.log(typeof resp);
+        // console.log(resp.data);
+        // console.log(typeof resp.data);
+
+        let respObj = JSON.parse(resp);
+
+        // console.log(data);
+        // console.log(typeof data);
+
+        if (typeof respObj == 'object' && typeof respObj.data == 'object') {
+          let hasError = false;
+
+          for (const [key, obj] of Object.entries(respObj.data)) {
+            console.log(key, obj);
+            if (obj.status) {
+              console.log("Success: " + obj.msg);
+              alert_toast(obj.msg, 'success');
+            } else {
+              hasError = true;
+              console.log("Error: " + obj.msg);
+              alert_toast(obj.msg, 'error');
+            }
+          }
+
+          if (!hasError) {
+            location.reload();
+          }
+      }
+        // if (resp == 1) {
+        //   // alert_toast("Data successfully saved",'success')
+        //   location.reload();
+        // } else {
+        //   $("#msg").html(
+        //     '<div class="alert alert-danger err_msg">An Error occured</div>'
+        //   );
+        //   end_load();
+        // }
       },
     });
   });

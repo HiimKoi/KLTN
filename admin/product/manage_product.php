@@ -25,9 +25,8 @@ if (isset($_GET['id']) && $_GET['id'] > 0) {
                     $qry = $conn->query("SELECT * FROM `categories` order by category asc");
                     while ($row = $qry->fetch_assoc()):
                         ?>
-                    <option value="<?php echo $row['id'] ?>"
-                        <?php echo isset($category_id) && $category_id == $row['id'] ? 'selected' : '' ?>>
-                        <?php echo $row['category'] ?></option>
+                        <option value="<?php echo $row['id'] ?>" <?php echo isset($category_id) && $category_id == $row['id'] ? 'selected' : '' ?>>
+                            <?php echo $row['category'] ?></option>
                     <?php endwhile; ?>
                 </select>
             </div>
@@ -81,7 +80,7 @@ if (isset($_GET['id']) && $_GET['id'] > 0) {
                 $upload_path = "uploads/product_" . $id;
                 if (is_dir(base_app . $upload_path)):
                     ?>
-            <?php
+                    <?php
 
                     $file = scandir(base_app . $upload_path);
                     foreach ($file as $img):
@@ -90,15 +89,15 @@ if (isset($_GET['id']) && $_GET['id'] > 0) {
 
 
                         ?>
-            <div class="d-flex w-100 align-items-center img-item">
-                <span><img src="<?php echo base_url . $upload_path . '/' . $img ?>" width="150px" height="100px"
-                        style="object-fit:cover;" class="img-thumbnail" alt=""></span>
-                <span class="ml-4"><button class="btn btn-sm btn-default text-danger rem_img" type="button"
-                        data-path="<?php echo base_app . $upload_path . '/' . $img ?>"><i
-                            class="fa fa-trash"></i></button></span>
-            </div>
-            <?php endforeach; ?>
-            <?php endif; ?>
+                        <div class="d-flex w-100 align-items-center img-item">
+                            <span><img src="<?php echo base_url . $upload_path . '/' . $img ?>" width="150px" height="100px"
+                                    style="object-fit:cover;" class="img-thumbnail" alt=""></span>
+                            <span class="ml-4"><button class="btn btn-sm btn-default text-danger rem_img" type="button"
+                                    data-path="<?php echo base_app . $upload_path . '/' . $img ?>"><i
+                                        class="fa fa-trash"></i></button></span>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             <?php endif; ?>
 
         </form>
@@ -109,146 +108,146 @@ if (isset($_GET['id']) && $_GET['id'] > 0) {
     </div>
 </div>
 <script>
-function displayImg(input, _this) {
-    console.log(input.files)
-    var fnames = []
-    Object.keys(input.files).map(k => {
-        fnames.push(input.files[k].name)
-    })
-    _this.siblings('.custom-file-label').html(JSON.stringify(fnames))
+    function displayImg(input, _this) {
+        console.log(input.files)
+        var fnames = []
+        Object.keys(input.files).map(k => {
+            fnames.push(input.files[k].name)
+        })
+        _this.siblings('.custom-file-label').html(JSON.stringify(fnames))
 
-}
+    }
 
-function delete_img($path) {
-    start_loader()
+    function delete_img($path) {
+        start_loader()
 
-    $.ajax({
-        url: _base_url_ + 'classes/Master.php?f=delete_img',
-        data: {
-            path: $path
-        },
-        method: 'POST',
-        dataType: "json",
-        error: err => {
-            console.log(err)
-            alert_toast("Đã xảy ra lỗi khi xóa Hình ảnh", "error");
-            end_loader()
-        },
-        success: function(resp) {
-            $('.modal').modal('hide')
-            if (typeof resp == 'object' && resp.status == 'success') {
-                $('[data-path="' + $path + '"]').closest('.img-item').hide('slow', function() {
-                    $('[data-path="' + $path + '"]').closest('.img-item').remove()
-                })
-                alert_toast("Đã xóa hình ảnh thành công", "success");
-            } else {
-                console.log(resp)
+        $.ajax({
+            url: _base_url_ + 'classes/Master.php?f=delete_img',
+            data: {
+                path: $path
+            },
+            method: 'POST',
+            dataType: "json",
+            error: err => {
+                console.log(err)
                 alert_toast("Đã xảy ra lỗi khi xóa Hình ảnh", "error");
-            }
-            end_loader()
-        }
-    })
-}
-var sub_categories = $.parseJSON('<?php echo json_encode($sub_categories) ?>');
-$(document).ready(function() {
-    $('.rem_img').click(function() {
-        _conf("Bạn chắc chắn để xóa hình ảnh này?", 'delete_img', ["'" + $(this).attr('data-path') +
-            "'"
-        ])
-    })
-
-    $('#category_id').change(function() {
-        var cid = $(this).val()
-        var opt = "<option></option>";
-        Object.keys(sub_categories).map(k => {
-            if (k == cid) {
-                Object.keys(sub_categories[k]).map(i => {
-                    if ('<?php echo isset($sub_category_id) ? $sub_category_id : 0 ?>' ==
-                        sub_categories[k][i].id) {
-                        opt += "<option value='" + sub_categories[k][i].id +
-                            "' selected>" + sub_categories[k][i].sub_category +
-                            "</option>";
-                    } else {
-                        opt += "<option value='" + sub_categories[k][i].id + "'>" +
-                            sub_categories[k][i].sub_category + "</option>";
-                    }
-                })
+                end_loader()
+            },
+            success: function (resp) {
+                $('.modal').modal('hide')
+                if (typeof resp == 'object' && resp.status == 'success') {
+                    $('[data-path="' + $path + '"]').closest('.img-item').hide('slow', function () {
+                        $('[data-path="' + $path + '"]').closest('.img-item').remove()
+                    })
+                    alert_toast("Đã xóa hình ảnh thành công", "success");
+                } else {
+                    console.log(resp)
+                    alert_toast("Đã xảy ra lỗi khi xóa Hình ảnh", "error");
+                }
+                end_loader()
             }
         })
-        $('#sub_category_id').html(opt)
-        $('#sub_category_id').select2({
+    }
+    var sub_categories = $.parseJSON('<?php echo json_encode($sub_categories) ?>');
+    $(document).ready(function () {
+        $('.rem_img').click(function () {
+            _conf("Bạn chắc chắn để xóa hình ảnh này?", 'delete_img', ["'" + $(this).attr('data-path') +
+                "'"
+            ])
+        })
+
+        $('#category_id').change(function () {
+            var cid = $(this).val()
+            var opt = "<option></option>";
+            Object.keys(sub_categories).map(k => {
+                if (k == cid) {
+                    Object.keys(sub_categories[k]).map(i => {
+                        if ('<?php echo isset($sub_category_id) ? $sub_category_id : 0 ?>' ==
+                            sub_categories[k][i].id) {
+                            opt += "<option value='" + sub_categories[k][i].id +
+                                "' selected>" + sub_categories[k][i].sub_category +
+                                "</option>";
+                        } else {
+                            opt += "<option value='" + sub_categories[k][i].id + "'>" +
+                                sub_categories[k][i].sub_category + "</option>";
+                        }
+                    })
+                }
+            })
+            $('#sub_category_id').html(opt)
+            $('#sub_category_id').select2({
+                placeholder: "Vui lòng điền mục này",
+                width: "relative"
+            })
+        })
+        $('.select2').select2({
             placeholder: "Vui lòng điền mục này",
             width: "relative"
         })
-    })
-    $('.select2').select2({
-        placeholder: "Vui lòng điền mục này",
-        width: "relative"
-    })
-    if (parseInt("<?php echo isset($category_id) ? $category_id : 0 ?>") > 0) {
-        // console.log('test')
-        start_loader()
-        setTimeout(() => {
-            $('#category_id').trigger("change");
-            end_loader()
-        }, 750);
-    }
-    $('#product-form').submit(function(e) {
-        e.preventDefault();
-        var _this = $(this)
-        $('.err-msg').remove();
-        start_loader();
-        $.ajax({
-            url: _base_url_ + "classes/Master.php?f=save_product",
-            data: new FormData($(this)[0]),
-            cache: false,
-            contentType: false,
-            processData: false,
-            method: 'POST',
-            type: 'POST',
-            dataType: 'json',
+        if (parseInt("<?php echo isset($category_id) ? $category_id : 0 ?>") > 0) {
+            // console.log('test')
+            start_loader()
+            setTimeout(() => {
+                $('#category_id').trigger("change");
+                end_loader()
+            }, 750);
+        }
+        $('#product-form').submit(function (e) {
+            e.preventDefault();
+            var _this = $(this)
+            $('.err-msg').remove();
+            start_loader();
+            $.ajax({
+                url: _base_url_ + "classes/Master.php?f=save_product",
+                data: new FormData($(this)[0]),
+                cache: false,
+                contentType: false,
+                processData: false,
+                method: 'POST',
+                type: 'POST',
+                dataType: 'json',
 
-            success: function(resp) {
-                console.log(resp);
+                success: function (resp) {
+                    // console.log(resp);
 
-                if (typeof resp == 'object' && typeof resp.data == 'object') {
-                    let hasError = false;
+                    if (typeof resp == 'object' && typeof resp.data == 'object') {
+                        let hasError = false;
 
-                    for (const [key, obj] of Object.entries(resp.data)) {
-                        if (obj.status) {
-                            console.log("Success: " + obj.msg);
-                            alert_toast(obj.msg, 'success');
-                        } else {
-                            hasError = true;
-                            console.log("Error: " + obj.msg);
-                            alert_toast(obj.msg, 'error');
+                        for (const [key, obj] of Object.entries(resp.data)) {
+                            if (obj.status) {
+                                // console.log("Success: " + obj.msg);
+                                alert_toast(obj.msg, 'success');
+                            } else {
+                                hasError = true;
+                                // console.log("Error: " + obj.msg);
+                                alert_toast(obj.msg, 'error');
+                            }
+                        }
+
+                        if (!hasError) {
+                            location.href = "./?page=product";
                         }
                     }
 
-                    if (!hasError) {
-                        location.href = "./?page=product";
-                    }
+                    end_loader();
                 }
+            })
+        })
 
-                end_loader();
-            }
+        $('.summernote').summernote({
+            height: 200,
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript',
+                    'clear'
+                ]],
+                ['fontname', ['fontname']],
+                ['fontsize', ['fontsize']],
+                ['color', ['color']],
+                ['para', ['ol', 'ul', 'paragraph', 'height']],
+                ['table', ['table']],
+                ['view', ['undo', 'redo', 'fullscreen', 'codeview', 'help']]
+            ]
         })
     })
-
-    $('.summernote').summernote({
-        height: 200,
-        toolbar: [
-            ['style', ['style']],
-            ['font', ['bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript',
-                'clear'
-            ]],
-            ['fontname', ['fontname']],
-            ['fontsize', ['fontsize']],
-            ['color', ['color']],
-            ['para', ['ol', 'ul', 'paragraph', 'height']],
-            ['table', ['table']],
-            ['view', ['undo', 'redo', 'fullscreen', 'codeview', 'help']]
-        ]
-    })
-})
 </script>
