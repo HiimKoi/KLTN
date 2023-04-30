@@ -44,8 +44,8 @@ if ($product->num_rows > 0) {
                         ?>
                     <div class="col">
                         <a href="javascript:void(0)" class="view-image <?php echo $k == 2 ? "active" : '' ?>"><img
-                                src="<?php echo validate_image('uploads/product_' . $sanitized_id . '/' . $img) ?>"
-                                loading="lazy" class="img-thumbnail" alt=""></a>
+                                src="<?php echo validate_image('uploads/product_' . $id . '/' . $img) ?>" loading="lazy"
+                                class="img-thumbnail" alt=""></a>
                     </div>
                     <?php endforeach; ?>
                 </div>
