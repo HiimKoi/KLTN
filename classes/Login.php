@@ -137,17 +137,61 @@ class Login extends DBConnection
 	function login_user()
 	{
 		extract($_POST);
+		$user_agent = $_SERVER['HTTP_USER_AGENT'];
+		$ip = $_SERVER['REMOTE_ADDR'];
+		$status = false;
+
+		// update log login of client
+		//$login_query = "INSERT INTO `client_login`";
+
+		// check input email/password
+		if (!isset($email)) {
+			$resp['status'] = 'error';
+			// $resp['message'] = 'Vui lòng nhập email và password.';
+			$error = "Missing email.";
+			$resp['message'] = 'Vui lòng nhập email và password.';
+
+			$login_query = "INSERT INTO `client_login` set `user_agent`='$user_agent', `status`='$status', `error`='$error', `ip`='$ip'";
+
+			$this->conn->query($login_query);
+			return json_encode($resp);
+
+		} else {
+			if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+				$resp['status'] = 'error';
+				$resp['message'] = 'Email không hợp lệ.';
+				$error = "Email invalid.";
+
+				$login_query = "INSERT INTO `client_login` set `user_agent`='$user_agent', `status`='$status', `error`='$error', `ip`='$ip'";
+
+				$this->conn->query($login_query);
+
+				return json_encode($resp);
+			} elseif (!isset($password)) {
+				$error = "Missing email or password.";
+				$resp['message'] = 'Vui lòng nhập email và password.';
+
+				$login_query = "INSERT INTO `client_login` set `email`='$email', `user_agent`='$user_agent', `status`='$status', `error`='$error', `ip`='$ip'";
+
+				$this->conn->query($login_query);
+				return json_encode($resp);
+			}
+		}
 
 		// verify captcha
 		if (!isset($_POST["g-recaptcha-response"])) {
 			// request required have param g-recaptcha-response, if not return failed.
 			$resp['status'] = 'error';
 			$resp['message'] = 'Recaptcha Error.';
+
+			$error = "reCaptcha error.";
+			$login_query = "INSERT INTO `client_login` set `email`='$email', `user_agent`='$user_agent', `status`='$status', `error`='$error', `ip`='$ip'";
+			$this->conn->query($login_query);
+
 			return json_encode($resp);
 		} else {
 			// check reCaptcha valid
 			$secret_key = "6Ld1bS8lAAAAAFr0-YPNL96Q8XPDID4Q0iwQeUbh";
-			$ip = $_SERVER['REMOTE_ADDR'];
 			$response = $_POST["g-recaptcha-response"];
 			$url = "https://www.google.com/recaptcha/api/siteverify?secret=$secret_key&response=$response&remoteip=$ip";
 			$check = file_get_contents($url);
@@ -155,20 +199,17 @@ class Login extends DBConnection
 			if ($data_response->success != "true") {
 				$resp['status'] = 'error';
 				$resp['message'] = 'Vui lòng chọn reCaptcha';
+				$error = "Missing reCaptcha.";
+
+				$login_query = "INSERT INTO `client_login` set `email`='$email', `user_agent`='$user_agent', `status`='$status', `error`='$error', `ip`='$ip'";
+
+				$this->conn->query($login_query);
+
 				return json_encode($resp);
 			}
 		}
 
-		// check input email/password
-		if (!isset($email) || !isset($password)) {
-			$resp['status'] = 'error';
-			$resp['message'] = 'Vui lòng nhập email và password.';
-			return json_encode($resp);
-		} elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-			$resp['status'] = 'error';
-			$resp['message'] = 'Email không hợp lệ.';
-			return json_encode($resp);
-		}
+
 
 		$hash_password = md5($password);
 
@@ -176,6 +217,11 @@ class Login extends DBConnection
 
 		if ($qry->num_rows <= 0) {
 			$resp['status'] = 'incorrect';
+			$error = "Not found username.";
+
+			$login_query = "INSERT INTO `client_login` set `email`='$email', `user_agent`='$user_agent', `status`='$status', `error`='$error', `ip`='$ip'";
+
+			$this->conn->query($login_query);
 			return json_encode($resp);
 		}
 
@@ -195,7 +241,13 @@ class Login extends DBConnection
 		if ($count_failed >= 5 && $minutes < 10) {
 			$resp['status'] = 'error';
 			$after_time = 10 - $minutes;
-			$resp['message'] = "Login sai nhiều lần, vui lòng thử lại sau $after_time phút.";
+			$error = "Login sai nhiều lần, vui lòng thử lại sau $after_time phút.";
+			$resp['message'] = $error;
+
+			$login_query = "INSERT INTO `client_login` set `email`='$email', `user_agent`='$user_agent', `status`='$status', `error`='$error', `ip`='$ip'";
+
+			$this->conn->query($login_query);
+
 			return json_encode($resp);
 		}
 
@@ -208,6 +260,13 @@ class Login extends DBConnection
 			$this->conn->query($sql_update);
 
 			$resp['status'] = 'incorrect';
+
+			$error = "Incorrect password.";
+
+			$login_query = "INSERT INTO `client_login` set `email`='$email', `user_agent`='$user_agent', `status`='$status', `error`='$error', `ip`='$ip'";
+
+			$this->conn->query($login_query);
+
 			return json_encode($resp);
 		} else {
 			$count_failed = 0;
@@ -226,7 +285,13 @@ class Login extends DBConnection
 		$this->settings->set_userdata("date_created", $date_created);
 		$this->settings->set_userdata("last_login", $last_login);
 
+		$error = "Login success.";
+		$status = true;
+		$login_query = "INSERT INTO `client_login` set `email`='$email', `user_agent`='$user_agent', `status`=$status, `error`='$error', `ip`='$ip'";
+		$this->conn->query($login_query);
+
 		$resp['status'] = 'success';
+		$resp['test'] = $login_query;
 		return json_encode($resp);
 	}
 }
