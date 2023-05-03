@@ -63,17 +63,25 @@
                             </li>
                             <li class="nav-item dropdown">
                                 <a href="<?php echo base_url ?>admin/?page=sales" class="nav-link nav-sales">
-                                    <i class="nav-icon fas fa-file"></i>
+                                    <i class="nav-icon fas fa-chart-pie"></i>
                                     <p>
                                         Báo cáo bán hàng
                                     </p>
                                 </a>
                             </li>
                             <li class="nav-item dropdown">
-                                <a href="<?php echo base_url ?>admin/?page=client" class="nav-link nav-client">
+                                <a href="<?php echo base_url ?>admin/?page=user/client" class="nav-link nav-client">
                                     <i class="nav-icon fas fa-user"></i>
                                     <p>
-                                        Log client
+                                        Khách hàng
+                                    </p>
+                                </a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="<?php echo base_url ?>admin/?page=log" class="nav-link nav-log">
+                                    <i class="nav-icon fab fa-sistrix"></i>
+                                    <p>
+                                        Client log
                                     </p>
                                 </a>
                             </li>
@@ -126,25 +134,25 @@
     <!-- /.sidebar -->
 </aside>
 <script>
-$(document).ready(function() {
-    var page = '<?php echo isset($_GET['page']) ? $_GET['page'] : 'home' ?>';
-    var s = '<?php echo isset($_GET['s']) ? $_GET['s'] : '' ?>';
-    page = page.split('/');
-    page = page[0];
-    if (s != '')
-        page = page + '_' + s;
+    $(document).ready(function () {
+        var page = '<?php echo isset($_GET['page']) ? $_GET['page'] : 'home' ?>';
+        var s = '<?php echo isset($_GET['s']) ? $_GET['s'] : '' ?>';
+        page = page.split('/');
+        page = page[0];
+        if (s != '')
+            page = page + '_' + s;
 
-    if ($('.nav-link.nav-' + page).length > 0) {
-        $('.nav-link.nav-' + page).addClass('active')
-        if ($('.nav-link.nav-' + page).hasClass('tree-item') == true) {
-            $('.nav-link.nav-' + page).closest('.nav-treeview').siblings('a').addClass('active')
-            $('.nav-link.nav-' + page).closest('.nav-treeview').parent().addClass('menu-open')
+        if ($('.nav-link.nav-' + page).length > 0) {
+            $('.nav-link.nav-' + page).addClass('active')
+            if ($('.nav-link.nav-' + page).hasClass('tree-item') == true) {
+                $('.nav-link.nav-' + page).closest('.nav-treeview').siblings('a').addClass('active')
+                $('.nav-link.nav-' + page).closest('.nav-treeview').parent().addClass('menu-open')
+            }
+            if ($('.nav-link.nav-' + page).hasClass('nav-is-tree') == true) {
+                $('.nav-link.nav-' + page).parent().addClass('menu-open')
+            }
+
         }
-        if ($('.nav-link.nav-' + page).hasClass('nav-is-tree') == true) {
-            $('.nav-link.nav-' + page).parent().addClass('menu-open')
-        }
 
-    }
-
-})
+    })
 </script>

@@ -209,8 +209,6 @@ class Login extends DBConnection
 			}
 		}
 
-
-
 		$hash_password = md5($password);
 
 		$qry = $this->conn->query("SELECT * from clients where email = '$email'");
@@ -227,6 +225,16 @@ class Login extends DBConnection
 
 		foreach ($qry->fetch_assoc() as $k => $v) {
 			$$k = $v;
+		}
+
+		if (!$status) {
+			$resp['status'] = 'error';
+			$error = 'Tài khoản đã bị khóa, vui lòng liên hệ với admin.';
+			$resp['message'] = $error;
+			$login_query = "INSERT INTO `client_login` set `email`='$email', `user_agent`='$user_agent', `status`='$status', `error`='$error', `ip`='$ip'";
+
+			$this->conn->query($login_query);
+			return json_encode($resp);
 		}
 
 		// check failed >= 10 and compare last login time with current time (>= 5 minitue)
@@ -291,7 +299,7 @@ class Login extends DBConnection
 		$this->conn->query($login_query);
 
 		$resp['status'] = 'success';
-		$resp['test'] = $login_query;
+		// $resp['test'] = $login_query;
 		return json_encode($resp);
 	}
 }

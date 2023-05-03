@@ -759,6 +759,46 @@ class Master extends DBConnection
 			return false;
 		}
 	}
+
+	function ban_or_active_user()
+	{
+		extract($_POST);
+		$resp["status"] = "error";
+
+		if (isset($_POST['id'])) {
+			$id = (int) $_POST['id'];
+
+			if ($id == 0) {
+				$resp["msg"] = "Id user invalid.";
+				return json_encode($resp);
+			}
+
+			$query = "SELECT * FROM `clients` where id='{$id}'";
+			$resp["data"] = $query;
+			$result = $this->conn->query($query);
+
+			if ($this->capture_err())
+				return $this->capture_err();
+			if ($result->num_rows <= 0) {
+				$resp['msg'] = "User không tồn tại.";
+				return json_encode($resp);
+			}
+
+			$row = $result->fetch_assoc();
+
+			$status = $row["status"];
+			$status = !$status;
+			$update = "UPDATE `clients` set status='{$status}' where id='{$id}'";
+			$this->conn->query($update);
+			$resp["status"] = "success";
+			$resp['msg'] = "Update user thành công.";
+
+			return json_encode($resp);
+		} else {
+			$resp["msg"] = "Id user invalid.";
+			return json_encode($resp);
+		}
+	}
 }
 
 $Master = new Master();
@@ -783,7 +823,6 @@ switch ($action) {
 	case 'delete_product':
 		echo $Master->delete_product();
 		break;
-
 	case 'save_inventory':
 		echo $Master->save_inventory();
 		break;
@@ -823,13 +862,14 @@ switch ($action) {
 	case 'delete_order':
 		echo $Master->delete_order();
 		break;
-
 	case 'pay_with_momo':
 		echo $Master->payWithMomo();
 		break;
-
 	case 'pay_with_vnpay':
 		echo $Master->payWithVNPay();
+		break;
+	case 'ban_or_active_user':
+		echo $Master->ban_or_active_user();
 		break;
 	default:
 		// echo $sysset->index();

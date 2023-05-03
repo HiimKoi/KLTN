@@ -55,9 +55,9 @@ $(document).ready(function () {
         url: _base_url_ + "classes/Login.php?f=login",
         method: "POST",
         data: $("form").serialize(),
-        error: (err) => {
-          console.log(err);
-        },
+        // error: (err) => {
+        //   console.log(err);
+        // },
         success: function (resp) {
           console.log(resp);
           grecaptcha.reset();
@@ -97,6 +97,7 @@ $(document).ready(function () {
         console.log(err);
       },
       success: function (resp) {
+        end_loader();
         if (resp) {
           resp = JSON.parse(resp);
           if (resp.status == "success") {
@@ -109,7 +110,6 @@ $(document).ready(function () {
             _frm.find("input").addClass("is-invalid");
             $('[name="username"]').focus();
           }
-          end_loader();
         }
       },
     });
@@ -128,6 +128,8 @@ $(document).ready(function () {
         console.log(err);
       },
       success: function (resp) {
+        // console.log(resp);
+        end_loader();
         if (resp) {
           resp = JSON.parse(resp);
           if (resp.status == "success") {
@@ -140,7 +142,10 @@ $(document).ready(function () {
             _frm.find("input").addClass("is-invalid");
             $('[name="username"]').focus();
           }
-          end_loader();
+          else {
+            alert_toast(resp.message, "error");
+            end_loader();
+          }
         }
       },
     });
@@ -162,14 +167,7 @@ $(document).ready(function () {
         console.log(resp);
         end_loader();
 
-        // console.log(typeof resp);
-        // console.log(resp.data);
-        // console.log(typeof resp.data);
-
         let respObj = JSON.parse(resp);
-
-        // console.log(data);
-        // console.log(typeof data);
 
         if (typeof respObj == 'object' && typeof respObj.data == 'object') {
           let hasError = false;
@@ -190,15 +188,6 @@ $(document).ready(function () {
             location.reload();
           }
       }
-        // if (resp == 1) {
-        //   // alert_toast("Data successfully saved",'success')
-        //   location.reload();
-        // } else {
-        //   $("#msg").html(
-        //     '<div class="alert alert-danger err_msg">An Error occured</div>'
-        //   );
-        //   end_load();
-        // }
       },
     });
   });
