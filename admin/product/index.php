@@ -92,6 +92,9 @@ $(document).ready(function() {
             lengthMenu: "Hiển thị _MENU_ dòng mỗi trang",
             search: "Tìm kiếm:",
             info: "Hiển thị _START_ đến _END_ của _TOTAL_ dòng",
+            paginate: {
+                        "previous": "Trước",
+                        "next": "Sau"}
         }
     });
 })
