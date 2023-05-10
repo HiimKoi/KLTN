@@ -115,12 +115,15 @@
             _conf("Bạn có chắc chắn block/active user không?", "delete_product", [$(this).attr('data-id')]);
         })
         $('table').dataTable({
-            language: {
-                lengthMenu: "Hiển thị _MENU_ dòng mỗi trang",
-                search: "Tìm kiếm:",
-                info: "Hiển thị _START_ đến _END_ của _TOTAL_ dòng",
-            }
-        });
+        language: {
+            lengthMenu: "Hiển thị _MENU_ dòng mỗi trang",
+            search: "Tìm kiếm:",
+            info: "Hiển thị _START_ đến _END_ của _TOTAL_ dòng",
+            paginate: {
+                        "previous": "Trước",
+                        "next": "Sau"}
+        }
+    });
     })
 
     function delete_product($id) {
