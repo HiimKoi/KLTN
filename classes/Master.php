@@ -334,22 +334,35 @@ class Master extends DBConnection
 	{
 		extract($_POST);
 		$data = "";
-		$_POST['password'] = md5($_POST['password']);
+
 		foreach ($_POST as $k => $v) {
 			if (!in_array($k, array('id'))) {
 				if (!empty($data))
 					$data .= ",";
-				$data .= " `{$k}`='{$v}' ";
+				if ($k != 'search' && $k != 'password') {
+					$data .= " `{$k}`='{$v}' ";
+				}
 			}
 		}
 		$check = $this->conn->query("SELECT * FROM `clients` where `email` = '{$email}' " . (!empty($id) ? " and id != {$id} " : "") . " ")->num_rows;
 		if ($this->capture_err())
 			return $this->capture_err();
+		// check user exist
 		if ($check > 0) {
 			$resp['status'] = 'failed';
 			$resp['msg'] = "Email đã tồn tại.";
 			return json_encode($resp);
 		}
+
+		// check password
+		if (!preg_match("/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,16}$/", $password)) {
+			$resp['status'] = 'error';
+			$resp['msg'] = "Password không hợp lệ.";
+			return json_encode($resp);
+		}
+
+		// set password is md5 before insert/update
+		$data .= " `password`='" . md5($password) . "'";
 		if (empty($id)) {
 			$sql = "INSERT INTO `clients` set {$data} ";
 			$save = $this->conn->query($sql);
@@ -369,8 +382,8 @@ class Master extends DBConnection
 			}
 			$this->settings->set_userdata('id', $id);
 		} else {
-			$resp['status'] = 'failed';
-			$resp['err'] = $this->conn->error . "[{$sql}]";
+			$resp['status'] = 'error';
+			$resp['message'] = 'Đăng ký tài khoản không thành công.';
 		}
 		return json_encode($resp);
 	}
