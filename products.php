@@ -61,21 +61,21 @@ if (isset($_GET['c']) && isset($_GET['s'])) {
 <section class="py-5">
     <div class="container-fluid row">
         <?php if (isset($_GET['c'])): ?>
-        <div class="col-md-3 border-right mb-2 pb-3">
-            <h3><b>Loại Sản Phẩm</b></h3>
-            <div class="list-group">
-                <a href="./?p=products&c=<?php echo $sanitized_c_id ?>"
-                    class="list-group-item <?php echo !isset($sanitized_sub_id) ? "active" : "" ?>">Tất cả</a>
-                <?php
+            <div class="col-md-3 border-right mb-2 pb-3">
+                <h3><b>Loại Sản Phẩm</b></h3>
+                <div class="list-group">
+                    <a href="./?p=products&c=<?php echo $sanitized_c_id ?>"
+                        class="list-group-item <?php echo !isset($sanitized_sub_id) ? "active" : "" ?>">Tất cả</a>
+                    <?php
                     $sub_cat = $conn->query("SELECT * FROM `sub_categories` where md5(parent_id) =  '{$sanitized_c_id}' ");
                     while ($row = $sub_cat->fetch_assoc()):
                         ?>
-                <a href="./?p=products&c=<?php echo $sanitized_c_id ?>&s=<?php echo md5($row['id']) ?>"
-                    class="list-group-item  <?php echo isset($_GET['s']) && $_GET['s'] == md5($row['id']) ? "active" : "" ?>"><?php echo $row['sub_category'] ?></a>
-                <?php endwhile; ?>
+                        <a href="./?p=products&c=<?php echo $sanitized_c_id ?>&s=<?php echo md5($row['id']) ?>"
+                            class="list-group-item  <?php echo isset($_GET['s']) && $_GET['s'] == md5($row['id']) ? "active" : "" ?>"><?php echo $row['sub_category'] ?></a>
+                    <?php endwhile; ?>
+                </div>
+                <hr>
             </div>
-            <hr>
-        </div>
         <?php endif; ?>
         <div class="<?php echo isset($_GET['c']) ? 'col-md-9' : 'col-md-10 offset-md-1' ?>">
             <div class="container-fluid p-0">
@@ -85,17 +85,20 @@ if (isset($_GET['c']) && isset($_GET['s'])) {
                             aria-controls="book" aria-selected="true">Sản Phẩm</a>
                     </li>
                     <?php if (isset($_GET['c'])): ?>
-                    <li class="nav-item" role="presentation">
-                        <a class="nav-link" id="details-tab" data-toggle="tab" href="#details" role="tab"
-                            aria-controls="details" aria-selected="false">Chi tiết</a>
-                    </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="details-tab" data-toggle="tab" href="#details" role="tab"
+                                aria-controls="details" aria-selected="false">Chi tiết</a>
+                        </li>
                     <?php endif; ?>
                 </ul>
                 <div class="tab-content pt-2">
                     <div class="tab-pane fade show active" id="book">
                         <?php
                         if (isset($_GET['search'])) {
-                            echo "<h4 class='text-center'><b>Search Result for '" . htmlentities($_GET['search']) . "'</b></h4>";
+                            $filter = htmlspecialchars($_GET['search']);
+                            // echo $filter;
+                            echo "<h4 class='text-center'><b>Search Result for '" . $filter . "'</b></h4>";
+                            // echo "<h4 class='text-center'><b>Search Result for '" . filter_input_array($_GET['search'], FILTER_SANITIZE_STRING) . "'</b></h4>";
                         }
                         ?>
 
@@ -138,39 +141,39 @@ if (isset($_GET['c']) && isset($_GET['s'])) {
                                     $inv[] = number_format($ir['price']);
                                 }
                                 ?>
-                            <div class="col-md-12 mb-5">
-                                <div class="card product-item">
-                                    <!-- Product image-->
-                                    <img class="card-img-top w-100" src="<?php echo validate_image($img) ?>"
-                                        loading="lazy" alt="..." />
-                                    <!-- Product details-->
-                                    <div class="card-body p-4">
-                                        <div class="">
-                                            <!-- Product name-->
-                                            <h5 class="fw-bolder">
-                                                <?php echo $row['title'] ?>
-                                            </h5>
-                                            <!-- Product price-->
-                                            <?php foreach ($inv as $k => $v): ?>
-                                            <span><b>Giá: </b>
-                                                <?php echo $v ?>
-                                            </span>
-                                            <?php endforeach; ?>
+                                <div class="col-md-12 mb-5">
+                                    <div class="card product-item">
+                                        <!-- Product image-->
+                                        <img class="card-img-top w-100" src="<?php echo validate_image($img) ?>"
+                                            loading="lazy" alt="..." />
+                                        <!-- Product details-->
+                                        <div class="card-body p-4">
+                                            <div class="">
+                                                <!-- Product name-->
+                                                <h5 class="fw-bolder">
+                                                    <?php echo $row['title'] ?>
+                                                </h5>
+                                                <!-- Product price-->
+                                                <?php foreach ($inv as $k => $v): ?>
+                                                    <span><b>Giá: </b>
+                                                        <?php echo $v ?>
+                                                    </span>
+                                                <?php endforeach; ?>
+                                            </div>
+                                            <p class="m-0"><small>Nguyên liệu:
+                                                    <?php echo $row['author'] ?>
+                                                </small></p>
                                         </div>
-                                        <p class="m-0"><small>Nguyên liệu:
-                                                <?php echo $row['author'] ?>
-                                            </small></p>
-                                    </div>
-                                    <!-- Product actions-->
-                                    <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                                        <div class="text-center">
-                                            <a class="btn btn-flat btn-primary "
-                                                href=".?p=view_product&id=<?php echo md5($row['id']) ?>">View</a>
-                                        </div>
+                                        <!-- Product actions-->
+                                        <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                                            <div class="text-center">
+                                                <a class="btn btn-flat btn-primary "
+                                                    href=".?p=view_product&id=<?php echo md5($row['id']) ?>">View</a>
+                                            </div>
 
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
                             <?php endwhile; ?>
                             <?php
                             if ($products->num_rows <= 0) {
